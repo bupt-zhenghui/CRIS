@@ -151,7 +151,8 @@ def inference(test_loader, model, args):
     time.sleep(2)
     for img, param in tbar:
         # data
-        img = img.cuda(non_blocking=True)
+        # img = img.cuda(non_blocking=True)
+
         mask = cv2.imread(param['mask_dir'][0], flags=cv2.IMREAD_GRAYSCALE)
         # dump image & mask
         if args.visualize:
@@ -166,7 +167,7 @@ def inference(test_loader, model, args):
         for sent in param['sents']:
             mask = mask / 255.
             text = tokenize(sent, args.word_len, True)
-            text = text.cuda(non_blocking=True)
+            # text = text.cuda(non_blocking=True)
             # inference
             pred = model(img, text)
             pred = torch.sigmoid(pred)
@@ -183,6 +184,8 @@ def inference(test_loader, model, args):
                                   flags=cv2.INTER_CUBIC,
                                   borderValue=0.)
             pred = np.array(pred > 0.35)
+
+            mask = cv2.resize(mask, (w, h))
             # iou
             inter = np.logical_and(pred, mask)
             union = np.logical_or(pred, mask)
